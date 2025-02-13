@@ -13,24 +13,24 @@ import config from './lib/config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-function loadPlugins() {
+async function loadPlugins() {
   const plugins = {};
   const pluginsDir = path.join(__dirname, 'plugins');
 
-  function scanDirectory(dir) {
+  async function scanDirectory(dir) {
     const items = fs.readdirSync(dir, { withFileTypes: true });
     for (const item of items) {
       const fullPath = path.join(dir, item.name);
       if (item.isDirectory()) {
-        scanDirectory(fullPath);
+        await scanDirectory(fullPath);
       } else if (item.isFile() && item.name.endsWith('.js')) {
         const pluginName = item.name.slice(0, -3);
-        plugins[pluginName] = require(fullPath);
+        plugins[pluginName] = await import(fullPath);
       }
     }
   }
 
-  scanDirectory(pluginsDir);
+  await scanDirectory(pluginsDir);
   return plugins;
 }
 
@@ -64,7 +64,7 @@ async function connectToWhatsApp() {
 
   sock.ev.on('creds.update', saveCreds);
 
-  const plugins = loadPlugins();
+  const plugins = await loadPlugins();
 
   for (const pluginName in plugins) {
     const plugin = plugins[pluginName];
@@ -81,11 +81,14 @@ async function connectToWhatsApp() {
       const userId = msg.key.participant || msg.key.remoteJid;
       const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
 
-      const antispam = require('./plugins/security/antispam.js');
-      await antispam.handle(sock, msg);
-      if (msg.isSpam) return;
+      const antispam = await import('./plugins/security/antispam.js');
+      if (antispam && typeof antispam.handle === 'function') {
+        await antispam.handle(sock, msg);
+      } else {
+        console.error('antispam.handle is not a function');
+      }
 
-      const commandTriggers = ['ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>', 'ai', 'cai'];
+      const commandTriggers = ['ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
       let isCommand = false;
       const lowerText = text.toLowerCase().trim();
       for (const trigger of commandTriggers) {
@@ -96,7 +99,7 @@ async function connectToWhatsApp() {
       }
 
       if (isCommand && !lowerText.match(/^(register|unregister)\b/i)) {
-        const db = require('./lib/DB.js');
+        const db = await import('./lib/DB.js');
         if (!db.isRegistered(userId)) {
           await sock.sendMessage(msg.key.remoteJid, {
             text: "You must register first. Use: register <username>"
