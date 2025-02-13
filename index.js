@@ -85,7 +85,7 @@ async function connectToWhatsApp() {
       await antispam.handle(sock, msg);
       if (msg.isSpam) return;
 
-      const commandTriggers = ['ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
+      const commandTriggers = ['ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>', 'ai', 'cai'];
       let isCommand = false;
       const lowerText = text.toLowerCase().trim();
       for (const trigger of commandTriggers) {
