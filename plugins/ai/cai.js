@@ -1,4 +1,4 @@
-const { CAINode } = require("cainode");
+import { CAINode } from "cainode";
 const client = new CAINode();
 
 // In-memory storage for user chat history
@@ -6,10 +6,9 @@ const userChatHistory = {};
 
 async function generateCAIResponse(userInput) {
     try {
-        await client.login("RWABGq1cnSiJ1a31GOwE6eK35iFTA2hKpY96UITrz0g"); // Replace with your Character.AI token
-        const characterId = "RWABGq1cnSiJ1a31GOwE6eK35iFTA2hKpY96UITrz0g"; // Replace with your character ID
-        const chat = await client.character.connect(characterId);
-        const response = await client.character.send_message(userInput);
+        await client.login("YOUR_CHARACTER_AI_TOKEN"); // Replace with your Character.AI token
+        const characterId = "YOUR_CHARACTER_ID"; // Replace with your character ID
+        const response = await client.character.send_message(characterId, userInput);
         return response.message;
     } catch (error) {
         console.error("Error fetching data from Character AI:", error.message);
@@ -19,7 +18,7 @@ async function generateCAIResponse(userInput) {
     }
 }
 
-module.exports = {
+export default {
     handle: async (sock, msg) => {
         const text = (msg.message?.conversation || msg.message?.extendedTextMessage?.text || "").trim();
         const commandMatch = text.match(/^cai\s+(.+)/i);
