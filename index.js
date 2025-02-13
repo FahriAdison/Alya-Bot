@@ -3,12 +3,17 @@ import { makeWASocket, useMultiFileAuthState, DisconnectReason } from '@whiskeys
 import pino from 'pino';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url'; // Import fileURLToPath from url module
+import { dirname } from 'path'; // Import dirname from path module
 import { printMessageInfo } from './lib/message-info.js';
 import qrcode from 'qrcode-terminal';
 import config from './lib/config.js';
 
+// Define __dirname using fileURLToPath and dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 function loadPlugins() {
-  const __dirname = dirname(fileURLToPath(import.meta.url));
   const plugins = {};
   const pluginsDir = path.join(__dirname, 'plugins');
 
