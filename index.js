@@ -88,7 +88,7 @@ async function connectToWhatsApp() {
         console.error('antispam.handle is not a function');
       }
 
-      const commandTriggers = ['ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
+      const commandTriggers = ['register','unregister','ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
       let isCommand = false;
       const lowerText = text.toLowerCase().trim();
       for (const trigger of commandTriggers) {
