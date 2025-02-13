@@ -81,7 +81,7 @@ async function connectToWhatsApp() {
       const userId = msg.key.participant || msg.key.remoteJid;
       const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
 
-      const antispam = require('./plugins/security/antispam');
+      const antispam = require('./plugins/security/antispam.js');
       await antispam.handle(sock, msg);
       if (msg.isSpam) return;
 
