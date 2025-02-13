@@ -73,49 +73,50 @@ async function connectToWhatsApp() {
     }
   }
 
-  sock.ev.on('messages.upsert', async (m) => {
-    const msg = m.messages[0];
-    if (!msg.key.fromMe && m.messages) {
-      printMessageInfo(msg);
+sock.ev.on('messages.upsert', async (m) => {
+  const msg = m.messages[0];
+  if (!msg.key.fromMe && m.messages) {
+    printMessageInfo(msg);
 
-      const userId = msg.key.participant || msg.key.remoteJid;
-      const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
+    const userId = msg.key.participant || msg.key.remoteJid;
+    const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
 
-      const antispam = await import('./plugins/security/antispam.js');
-      if (antispam && typeof antispam.handle === 'function') {
-        await antispam.handle(sock, msg);
-      } else {
-        console.error('antispam.handle is not a function');
-      }
+    // Import antispam module correctly
+    const antispam = (await import('./plugins/security/antispam.js')).default;
+    if (antispam && typeof antispam.handle === 'function') {
+      await antispam.handle(sock, msg);
+    } else {
+      console.error('antispam.handle is not a function');
+    }
 
-      const commandTriggers = ['register','unregister','ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
-      let isCommand = false;
-      const lowerText = text.toLowerCase().trim();
-      for (const trigger of commandTriggers) {
-        if (lowerText === trigger || lowerText.startsWith(trigger + ' ')) {
-          isCommand = true;
-          break;
-        }
-      }
-
-      if (isCommand && !lowerText.match(/^(register|unregister)\b/i)) {
-        const db = await import('./lib/DB.js');
-        if (!db.isRegistered(userId)) {
-          await sock.sendMessage(msg.key.remoteJid, {
-            text: "You must register first. Use: register <username>"
-          }, { quoted: msg });
-          return;
-        }
-      }
-
-      for (const pluginName in plugins) {
-        const plugin = plugins[pluginName];
-        if (plugin && typeof plugin.handle === 'function') {
-          plugin.handle(sock, msg);
-        }
+    const commandTriggers = ['register','unregister','ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
+    let isCommand = false;
+    const lowerText = text.toLowerCase().trim();
+    for (const trigger of commandTriggers) {
+      if (lowerText === trigger || lowerText.startsWith(trigger + ' ')) {
+        isCommand = true;
+        break;
       }
     }
-  });
+
+    if (isCommand && !lowerText.match(/^(register|unregister)\b/i)) {
+      const db = await import('./lib/DB.js');
+      if (!db.isRegistered(userId)) {
+        await sock.sendMessage(msg.key.remoteJid, {
+          text: "You must register first. Use: register <username>"
+        }, { quoted: msg });
+        return;
+      }
+    }
+
+    for (const pluginName in plugins) {
+      const plugin = plugins[pluginName];
+      if (plugin && typeof plugin.handle === 'function') {
+        plugin.handle(sock, msg);
+      }
+    }
+  }
+});
 
   return sock;
 }
