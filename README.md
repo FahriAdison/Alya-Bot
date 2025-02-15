@@ -1,7 +1,7 @@
 ---
 
 <p align="center">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBMhkW9_fhcC7pJHRI-H_bn9AYDVLkgYm_Gw&usqp=CAU" alt="Alya-Bot" width="100%">
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEZ68teEMBr3lzhdLiSdWeUGhIyw_kPycIVw&usqp=CAU" alt="Alya-Bot" width="100%">
 </p>
 
 <h1 align="center">🤖 Alya-Bot - WhatsApp Multi-Function Bot</h1>
