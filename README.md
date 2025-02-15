@@ -18,6 +18,46 @@
 
 ---
 
+
+# 📜 Changelog - Alya-Bot
+
+All notable changes to this project will be documented in this file.  
+This project follows **Semantic Versioning (`v<major>.<minor>.<patch>`)**.
+
+---
+
+## **[v1.1.0] - 2024-02-16**
+### ✨ New Features
+- **Added support for Character AI & OpenAI chat integration**
+- **Enhanced logging with `message-info.js`** for cleaner console output
+- **Added RPG claim system & leaderboard**
+- **Added multi-platform installation guide (Windows, macOS, Linux, Ubuntu, Termux, Pterodactyl)**
+
+### 🐞 Bug Fixes
+- **Fixed registration & unregistration issues**
+- **Database (`database.json`) now correctly saves & loads user data**
+- **Fixed `register` and `unregister` commands not responding in Termux**
+- **Anti-spam system now properly blocks rapid messages**
+
+### 🚀 Improvements
+- **Optimized plugin loading in `index.js`**
+- **Improved YouTube, Instagram & TikTok downloader stability**
+- **Formatted console logs with colors & structured messages**
+- **Replaced `console.log()` with `printMessageInfo()` from `message-info.js`**
+
+---
+
+## **[v1.0.0] - 2024-02-15**
+### 🎉 Initial Release
+- ✅ **WhatsApp AI Chat** (OpenAI & Character AI)
+- ✅ **YouTube, TikTok, Instagram Video Downloader**
+- ✅ **Basic Bot Commands (`ping`, `menu`, `help`)**
+- ✅ **Group Management Tools (Anti-Spam, Auto-Replies)**
+- ✅ **Owner Commands (`exec`, `eval`, etc.)**
+- ✅ **Multi-Platform Support** (Windows, Linux, Termux, Ubuntu, macOS)
+
+---
+
 ## **✨ Features**
 - ✅ **WhatsApp AI Chat** (OpenAI & Character AI)  
 - ✅ **YouTube, TikTok, Instagram Video Downloader**  
