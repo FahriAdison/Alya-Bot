@@ -8,21 +8,24 @@ export default {
     
     const providedId = match[1].trim();
     const userId = msg.key.participant || msg.key.remoteJid;
-    
+
+    console.log(`📩 Unregister command received: ${providedId} (${userId})`); // Debugging log
+
     if (!isRegistered(userId)) {
+      console.log("❌ User is not registered.");
       await sock.sendMessage(msg.key.remoteJid, {
-        text: "You are not registered."
+        text: "⚠️ You are not registered."
       }, { quoted: msg });
       return;
     }
     
     if (unregisterUser(userId, providedId)) {
       await sock.sendMessage(msg.key.remoteJid, {
-        text: "Unregister complete, if you want register again, command register <your username>."
+        text: "✅ Unregistration successful! You can register again with: `register <username>`."
       }, { quoted: msg });
     } else {
       await sock.sendMessage(msg.key.remoteJid, {
-        text: "Unregister failed. The provided ID does not match your registration ID."
+        text: "❌ Unregistration failed. Your provided ID is incorrect."
       }, { quoted: msg });
     }
   }

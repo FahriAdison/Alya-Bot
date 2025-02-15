@@ -8,10 +8,13 @@ export default {
     
     const username = match[1].trim();
     const userId = msg.key.participant || msg.key.remoteJid;
-    
+
+    console.log(`📩 Register command received: ${username} (${userId})`); // Debugging log
+
     if (isRegistered(userId)) {
+      console.log("❌ User is already registered.");
       await sock.sendMessage(msg.key.remoteJid, {
-        text: "You already registered, don't have to register again."
+        text: "⚠️ You are already registered."
       }, { quoted: msg });
       return;
     }
@@ -19,11 +22,11 @@ export default {
     const regId = registerUser(userId, username);
     if (regId) {
       await sock.sendMessage(msg.key.remoteJid, {
-        text: `Register Completed ${username}\nYour Id: ${regId}\nSave that id if you want unregister by command unregister <your id>`
+        text: `✅ Registration successful!\n👤 Username: ${username}\n🆔 ID: ${regId}\n\nUse this ID if you want to unregister.`
       }, { quoted: msg });
     } else {
       await sock.sendMessage(msg.key.remoteJid, {
-        text: "Registration failed. Please try again."
+        text: "❌ Registration failed. Please try again."
       }, { quoted: msg });
     }
   }
