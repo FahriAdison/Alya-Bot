@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file.
 ### 🐞 Bug Fixes
 - **Fixed registration & unregistration issues**
 - **Database (`database.json`) now correctly saves & loads user data**
-- **Fixed `register` and `unregister` commands not responding in Termux**
+- **Fixed `register` and `unregister` commands not responding**
 - **Anti-spam system now properly blocks rapid messages**
 
 ### 🚀 Improvements
@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## **[v1.0.0] - 2024-02-11**
+## **[v1.0.0] - 2024-02-13**
 ### 🎉 Initial Release
 - ✅ **WhatsApp AI Chat** (OpenAI & Character AI)
 - ✅ **YouTube, TikTok, Instagram Video Downloader**
