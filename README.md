@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## **[v1.1.0] - 2024-02-16**
+## **[v1.1.0] - 2025-02-16**
 ### ✨ New Features
 - **Added support for Character AI & OpenAI chat integration**
 - **Enhanced logging with `message-info.js`** for cleaner console output
@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## **[v1.0.0] - 2024-02-13**
+## **[v1.0.0] - 2025-02-13**
 ### 🎉 Initial Release
 - ✅ **WhatsApp AI Chat** (OpenAI & Character AI)
 - ✅ **YouTube, TikTok, Instagram Video Downloader**
