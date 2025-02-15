@@ -18,11 +18,9 @@
 
 ---
 
-
 # 📜 Changelog - Alya-Bot
 
 All notable changes to this project will be documented in this file.  
-This project follows **Semantic Versioning (`v<major>.<minor>.<patch>`)**.
 
 ---
 
@@ -47,7 +45,7 @@ This project follows **Semantic Versioning (`v<major>.<minor>.<patch>`)**.
 
 ---
 
-## **[v1.0.0] - 2024-02-15**
+## **[v1.0.0] - 2024-02-11**
 ### 🎉 Initial Release
 - ✅ **WhatsApp AI Chat** (OpenAI & Character AI)
 - ✅ **YouTube, TikTok, Instagram Video Downloader**
