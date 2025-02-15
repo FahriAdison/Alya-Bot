@@ -5,7 +5,7 @@
 <h1 align="center">🤖 Alya-Bot - WhatsApp Multi-Function Bot</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/JavaScript-ESM-green?style=for-the-badge&logo=javascript" alt="JavaScript">
+  <img src="[https://img.shields.io/badge/JavaScript-ESM-green?style=for-the-badge&logo=javascript](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBMhkW9_fhcC7pJHRI-H_bn9AYDVLkgYm_Gw&usqp=CAU)" alt="JavaScript">
   <img src="https://img.shields.io/badge/Node.js-%3E=16.0-green?style=for-the-badge&logo=node.js">
   <img src="https://img.shields.io/github/license/FahriAdison/Alya-Bot?style=for-the-badge">
 </p>
@@ -33,10 +33,10 @@ Follow these steps to set up Alya-Bot on **any platform**.
 - **FFmpeg** (for audio/video processing)
 
 ### **🖥️ Windows Setup**
+```
 1. **Install [Node.js](https://nodejs.org/) & [Git](https://git-scm.com/downloads)**  
 2. **Open PowerShell or CMD and run:**
-   ```sh
-   git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+   git clone https://github.com/FahriAdison/Alya-Bot.git
    cd YOUR-REPO
    npm install
 
@@ -44,12 +44,8 @@ Follow these steps to set up Alya-Bot on **any platform**.
 
 node index.js
 
-
 4. Scan the QR code to link WhatsApp!
-
-
-
-
+```
 ---
 
 🍏 macOS Setup
@@ -61,7 +57,7 @@ brew install node git
 
 2. Clone the repository & install dependencies
 
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git clone https://github.com/FahriAdison/Alya-Bot.git
 cd YOUR-REPO
 npm install
 
@@ -85,7 +81,7 @@ sudo apt install nodejs npm git ffmpeg -y
 
 2. Clone the project & install dependencies
 
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git clone https://github.com/FahriAdison/Alya-Bot.git
 cd YOUR-REPO
 npm install
 
@@ -112,120 +108,81 @@ pkg install nodejs git ffmpeg -y
 
 3. Clone and install the bot
 
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git clone https://github.com/FahriAdison/Alya-Bot.git
 cd YOUR-REPO
 npm install
 
 
 4. Start the bot
-
 node index.js
-
-
 5. Scan the QR code in WhatsApp Web.
 
 
 
-
 ---
-
+```
 📦 Pterodactyl Panel Setup
 
 1. Create a new server with Node.js 16+
-
-
 2. Connect to the server & install dependencies
-
 cd /home/container
 npm install
-
-
 3. Run the bot
-
 node index.js
-
-
 4. Scan the QR code from the panel console.
-
-
-
-
+```
 ---
 
+---
 🚀 Usage Guide
-
 📜 Commands
-
 Register:
-
-register <your_name>
-
+• register <your_name>
 Check Server Status:
-
-ping
-
+• ping
 Download YouTube Video:
-
-play <song_name>
-
+• play <song_name>
 Download TikTok Video:
-
-tiktok <link>
-
+• tiktok <link>
 Claim Daily Bonus:
-
-claim
-
+• claim
 Check Leaderboard:
-
-leaderboard
-
-
-
+• leaderboard
 ---
 
 🔧 Configuration
 
 Modify config.js to customize bot settings:
 
+---
 export default {
   ownerNumber: '1234567890@s.whatsapp.net',
   botName: 'Alya-Bot',
   prefix: '!',
   sessionPath: 'auth_info_baileys'
 };
-
-
 ---
 
 🛠️ Troubleshooting
 
 Bot Doesn't Start?
-
 Ensure you have Node.js 16+ installed
 
 Delete auth_info_baileys/ and restart:
-
 rm -rf auth_info_baileys
 node index.js
 
-
 Session Expired?
-
 Run:
-
 rm -rf auth_info_baileys
 
 Restart and scan the QR code again.
-
-
 
 ---
 
 📜 License
 
 This project is licensed under the MIT License.
-
 
 ---
 
@@ -242,12 +199,8 @@ Contributors:
   
 - And All The User😊
 
-
-
 ---
 
 <p align="center">
 💻 Developed with ❤️ by Papah-Chan Fahri 🚀
 </p>
-```
----
