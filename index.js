@@ -8,7 +8,7 @@ import { dirname } from 'path';
 import chalk from 'chalk';
 import readline from 'readline';
 import { printMessageInfo } from './lib/message-info.js'; // Import the logging utility
-import config from './config.js'; // Import config.js
+import config from './lib/config.js'; // Import config.js
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
