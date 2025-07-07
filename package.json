@@ -17,6 +17,7 @@
     "moment-timezone": "^0.5.47",
     "pino": "^9.6.0",
     "qrcode-terminal": "^0.12.0",
+    "syntax-error": "^1.4.0",
     "youtube-dl-exec": "^3.0.15",
     "ytsr": "^3.8.4"
   },
