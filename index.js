@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import chalk from 'chalk';
 import readline from 'readline';
-import { printMessageInfo } from './message-info.js'; // Import the logging utility
+import { printMessageInfo } from './lib/message-info.js'; // Import the logging utility
+import config from './config.js'; // Import config.js
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -48,11 +49,12 @@ const getConnectionOptions = async (state) => {
 
 async function loadPlugins() {
   const plugins = {};
-  const pluginsDir = path.join(__dirname, 'plugins'); // Path to the plugins directory
+  const commandTriggers = new Set(); // Menggunakan Set untuk pencarian perintah yang efisien
+  const pluginsDir = path.join(__dirname, 'plugins'); // Path ke direktori plugins
 
-  // Ensure the plugins directory exists
+  // Pastikan direktori plugins ada
   if (!fs.existsSync(pluginsDir)) {
-    console.warn(chalk.yellow(`⚠️ Plugin directory not found at ${pluginsDir}. Creating it...`));
+    console.warn(chalk.yellow(`⚠️ Direktori plugin tidak ditemukan di ${pluginsDir}. Membuatnya...`));
     fs.mkdirSync(pluginsDir, { recursive: true });
   }
 
@@ -61,102 +63,112 @@ async function loadPlugins() {
     for (const item of items) {
       const fullPath = path.join(dir, item.name);
       if (item.isDirectory()) {
-        await scanDirectory(fullPath); // Recursively scan subdirectories
+        await scanDirectory(fullPath); // Pindai subdirektori secara rekursif
       } else if (item.isFile() && item.name.endsWith('.js')) {
         try {
-          // Construct a relative path for dynamic import
+          // Buat path relatif untuk import dinamis
           const relativePath = path.relative(__dirname, fullPath).replace(/\\/g, '/');
-          const pluginName = item.name.slice(0, -3); // Get plugin name without .js extension
-          plugins[pluginName] = (await import(`./${relativePath}`)).default;
-          console.log(chalk.blue(`Loaded plugin: ${pluginName}`));
+          const pluginName = item.name.slice(0, -3); // Dapatkan nama plugin tanpa ekstensi .js
+          const loadedPlugin = (await import(`./${relativePath}`)).default;
+          plugins[pluginName] = loadedPlugin;
+
+          // Kumpulkan perintah dari plugin
+          if (loadedPlugin.command) {
+            commandTriggers.add(loadedPlugin.command.toLowerCase());
+          }
+          if (loadedPlugin.commands && Array.isArray(loadedPlugin.commands)) {
+            loadedPlugin.commands.forEach(cmd => commandTriggers.add(cmd.toLowerCase()));
+          }
+          console.log(chalk.blue(`Plugin dimuat: ${pluginName}`));
         } catch (error) {
-          console.error(chalk.red(`❌ Error loading plugin ${item.name} from ${fullPath}:`), error);
+          console.error(chalk.red(`❌ Kesalahan saat memuat plugin ${item.name} dari ${fullPath}:`), error);
         }
       }
     }
   }
 
   await scanDirectory(pluginsDir);
-  return plugins;
+  return { plugins, commandTriggers: Array.from(commandTriggers) }; // Kembalikan keduanya
 }
 
 async function handlePairingCode(sock) {
-  console.log(chalk.bgWhite(chalk.blue('Generating Pairing Code...')));
+  console.log(chalk.bgWhite(chalk.blue('Membuat Kode Pemasangan...')));
   
-  let phoneNumber = await question('Enter your WhatsApp number (with country code, e.g. +6281234567890): ');
+  let phoneNumber = await question('Masukkan nomor WhatsApp Anda (dengan kode negara, cth. +6281234567890): ');
   phoneNumber = phoneNumber.trim();
 
-  // Validate phone number format
+  // Validasi format nomor telepon
   if (PHONENUMBER_MCC && !Object.keys(PHONENUMBER_MCC).some(v => phoneNumber.startsWith(v))) {
-    throw new Error('Invalid phone number format! Please include country code.');
+    throw new Error('Format nomor telepon tidak valid! Harap sertakan kode negara.');
   }
 
-  // Generate and display pairing code
+  // Buat dan tampilkan kode pemasangan
   try {
     const code = await sock.requestPairingCode(phoneNumber);
     const formattedCode = code.match(/.{1,4}/g)?.join('-') || code;
-    console.log(chalk.black(chalk.bgGreen('YOUR PAIRING CODE:')), chalk.black(chalk.white(formattedCode)));
-    console.log(chalk.yellow('Enter this code in your WhatsApp linked devices menu within 2 minutes.'));
+    console.log(chalk.black(chalk.bgGreen('KODE PEMASANGAN ANDA:')), chalk.black(chalk.white(formattedCode)));
+    console.log(chalk.yellow('Masukkan kode ini di menu perangkat tertaut WhatsApp Anda dalam 2 menit.'));
   } catch (error) {
-    console.error(chalk.red('Failed to generate pairing code:'), error);
+    console.error(chalk.red('Gagal membuat kode pemasangan:'), error);
     throw error;
   }
 }
 
 async function connectToWhatsApp() {
   try {
-    const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+    const { state, saveCreds } = await useMultiFileAuthState('sessions');
     const connectionOptions = await getConnectionOptions(state);
     const sock = makeWASocket(connectionOptions);
 
-    // Handle credentials update
+    // Tangani pembaruan kredensial
     sock.ev.on('creds.update', saveCreds);
 
-    // Handle connection updates
+    // Tangani pembaruan koneksi
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, isNewLogin } = update;
 
       if (isNewLogin) {
-        console.log(chalk.green('✅ New login detected!'));
+        console.log(chalk.green('✅ Login baru terdeteksi!'));
       }
 
       if (connection === 'connecting') {
-        console.log(chalk.yellow('⚡ Connecting to WhatsApp...'));
+        console.log(chalk.yellow('⚡ Menghubungkan ke WhatsApp...'));
       }
 
       if (connection === 'open') {
-        console.log(chalk.green('🔓 Successfully connected to WhatsApp!'));
+        console.log(chalk.green('🔓 Berhasil terhubung ke WhatsApp!'));
       }
 
       if (connection === 'close') {
         const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-        console.log(shouldReconnect ? chalk.yellow('🔁 Connection lost, reconnecting...') : chalk.red('❌ Permanent logout'));
+        console.log(shouldReconnect ? chalk.yellow('🔁 Koneksi terputus, mencoba menyambungkan kembali...') : chalk.red('❌ Logout permanen'));
         if (shouldReconnect) {
           setTimeout(connectToWhatsApp, 5000);
         }
       }
     });
 
-    // Request pairing code if not registered
+    // Minta kode pemasangan jika belum terdaftar
     if (!state.creds.registered) {
       await handlePairingCode(sock);
     }
 
-    // Load plugins
-    const plugins = await loadPlugins();
-    console.log(chalk.green(`✅ Loaded ${Object.keys(plugins).length} plugins`));
+    // Muat plugins dan kumpulkan pemicu perintah
+    const { plugins, commandTriggers } = await loadPlugins(); // Destrukturisasi untuk mendapatkan commandTriggers
+    console.log(chalk.green(`✅ Memuat ${Object.keys(plugins).length} plugin`));
+    console.log(chalk.green(`✅ Mengidentifikasi ${commandTriggers.length} pemicu perintah`));
 
-    // Fixed message handler
+    // Penangan pesan tetap
     sock.ev.on('messages.upsert', async ({ messages }) => {
       for (const msg of messages) {
         try {
-          // Skip messages sent by the bot itself
+          // Lewati pesan yang dikirim oleh bot itu sendiri
           if (msg.key.fromMe) continue;
 
-          // Use printMessageInfo for logging
+          // Gunakan printMessageInfo untuk logging
           printMessageInfo(msg);
 
-          // Determine the correct JID to reply to
+          // Tentukan JID yang benar untuk membalas
           const isGroup = msg.key.remoteJid.endsWith('@g.us');
           const replyJid = isGroup ? msg.key.remoteJid : msg.key.participant || msg.key.remoteJid;
           
@@ -167,73 +179,74 @@ async function connectToWhatsApp() {
                       "";
           
           const userId = msg.key.participant || msg.key.remoteJid;
-
-          // Handle antispam (assuming antispam.js is in plugins/security/)
-          // Note: The original code had a direct import here, but if antispam is a plugin,
-          // it should be accessed via the 'plugins' object.
-          // I'm modifying this to access it from the loaded plugins.
-          const antispamPlugin = plugins.antispam; // Assuming 'antispam.js' is loaded as 'antispam'
-          if (antispamPlugin && typeof antispamPlugin.handle === 'function') {
-            await antispamPlugin.handle(sock, msg);
-            // The 'msg.isSpam' check implies antispam modifies the msg object,
-            // which is fine if that's the intended behavior.
-            if (msg.isSpam) continue;
-          }
-
-          // Handle commands
-          const commandTriggers = ['register','unregister','ai','cai','ig', 'play', 'tiktok', 'menu', 'ping', 'claim', 'leaderboard', 'lb', '$', '=>', '>'];
-          let isCommand = false;
           const lowerText = text.toLowerCase().trim();
-          
+
+          // Periksa apakah pengirim adalah owner
+          const senderNumber = userId.replace(/@s\.whatsapp\.net$/, '');
+          const isOwner = config.ownerNumber.includes(senderNumber);
+
+          let isCommandMessage = false;
+          // Periksa apakah pesan adalah perintah berdasarkan pemicu yang dikumpulkan
           for (const trigger of commandTriggers) {
             if (lowerText === trigger || lowerText.startsWith(trigger + ' ')) {
-              isCommand = true;
+              isCommandMessage = true;
               break;
             }
           }
 
-          if (isCommand && !lowerText.match(/^(register|unregister)\b/i)) {
-            const db = await import('./lib/DB.js');
-            if (!db.isRegistered(userId)) {
-              await sock.sendMessage(replyJid, {
-                text: "⚠️ You must register first! Use: *register <username>*"
-              }, { quoted: msg });
-              continue; // Stop processing if not registered
+          // --- START: Tangani Antispam ---
+          const antispamPlugin = plugins.antispam;
+          if (antispamPlugin && typeof antispamPlugin.handle === 'function') {
+            // Teruskan flag isCommandMessage yang baru
+            await antispamPlugin.handle(sock, msg, replyJid, isCommandMessage);
+            // Jika pesan ditandai sebagai spam, hentikan pemrosesan lebih lanjut
+            if (msg.isSpam) {
+              console.log(chalk.red(`DEBUG: Pesan ditandai sebagai SPAM untuk user ${userId}. Melewati pemrosesan command.`));
+              continue; // Lewati semua pemrosesan lebih lanjut untuk pesan spam
             }
           }
+          // --- END: Tangani Antispam ---
 
-          // Process plugins
+          // --- START: Tangani Perintah Pendaftaran Secara Terpisah (selalu diizinkan) ---
+          const isRegisterCommand = lowerText === 'register' || lowerText.startsWith('register ');
+          const isUnregisterCommand = lowerText === 'unregister' || lowerText.startsWith('unregister ');
+
+          if (isRegisterCommand) {
+            const registerPlugin = plugins.register;
+            if (registerPlugin && typeof registerPlugin.handle === 'function') {
+              await registerPlugin.handle(sock, msg, replyJid);
+              continue; // Hentikan pemrosesan setelah menangani pendaftaran
+            }
+          } else if (isUnregisterCommand) {
+            const unregisterPlugin = plugins.unregister;
+            if (unregisterPlugin && typeof unregisterPlugin.handle === 'function') {
+              await unregisterPlugin.handle(sock, msg, replyJid);
+              continue; // Hentikan pemrosesan setelah menangani pembatalan pendaftaran
+            }
+          }
+          // --- END: Tangani Perintah Pendaftaran Secara Terpisah ---
+
+          // --- START: Periksa Pendaftaran untuk perintah lain ---
+          const db = await import('./lib/DB.js');
+          // Hanya periksa pendaftaran jika itu adalah perintah DAN bukan perintah register/unregister
+          if (isCommandMessage && !db.isRegistered(userId) && !isRegisterCommand && !isUnregisterCommand) {
+            await sock.sendMessage(replyJid, {
+              text: "⚠️ Anda harus mendaftar terlebih dahulu! Gunakan: *register <username>*"
+            }, { quoted: msg });
+            continue; // Hentikan pemrosesan jika tidak terdaftar dan bukan perintah pendaftaran
+          }
+          // --- END: Periksa Pendaftaran untuk perintah lain ---
+
+          // Proses semua plugin yang dimuat (hanya jika bukan spam, sudah terdaftar untuk command, dll.)
           for (const pluginName in plugins) {
             const plugin = plugins[pluginName];
-            // Check if the current message matches a command handled by this plugin
-            // This is a more robust way to route commands to specific plugins
             if (plugin && typeof plugin.handle === 'function') {
-                // For 'ai' command, check if the text starts with 'ai ' or is exactly 'ai'
-                if (pluginName === 'ai' && (lowerText.startsWith('ai ') || lowerText === 'ai')) {
-                    await plugin.handle(sock, msg, replyJid);
-                } 
-                // For 'menu' command, check if the text is exactly 'menu'
-                else if (pluginName === 'menu' && lowerText === 'menu') {
-                    await plugin.handle(sock, msg, replyJid);
-                }
-                // For 'ping' command, check if the text is exactly 'ping'
-                else if (pluginName === 'ping' && lowerText === 'ping') {
-                    await plugin.handle(sock, msg, replyJid);
-                }
-                // Add similar checks for other specific commands like 'register', 'unregister', 'claim', 'leaderboard', 'tiktok', 'play', 'ig'
-                // For commands that might have arguments (e.g., 'register <username>', 'play <song>'),
-                // the plugin's handle function should parse the arguments.
-                // The current structure of 'ai.js', 'menu.js', 'ping.js' already handles their specific command parsing within their 'handle' function.
-                // So, the general loop below will still work if the plugin's handle function checks for its own trigger.
-                // However, for clarity and explicit routing, the above if-else if chain is better for direct commands.
-                // For general plugins that might react to any message, the original 'plugin.handle(sock, msg, replyJid)' is fine.
-                // Let's revert to original plugin processing, assuming each plugin handles its own command matching.
-                // The main issue is plugin loading.
-                await plugin.handle(sock, msg, replyJid);
+                // Teruskan isOwner ke setiap plugin
+                await plugin.handle(sock, msg, replyJid, isOwner);
             }
           }
         } catch (error) {
-          console.error(chalk.red('Error processing message:'), error);
+          console.error(chalk.red('Kesalahan saat memproses pesan:'), error);
         }
       }
     });
@@ -241,23 +254,23 @@ async function connectToWhatsApp() {
     return sock;
 
   } catch (error) {
-    console.error(chalk.red('⚠️ Connection error:'), error);
-    console.log(chalk.yellow('🔁 Attempting to reconnect in 10 seconds...'));
+    console.error(chalk.red('⚠️ Kesalahan koneksi:'), error);
+    console.log(chalk.yellow('🔁 Mencoba menyambungkan kembali dalam 10 detik...'));
     setTimeout(connectToWhatsApp, 10000);
   }
 }
 
-// Start the bot
+// Mulai bot
 connectToWhatsApp();
 
-// Clean up on exit
+// Bersihkan saat keluar
 process.on('SIGINT', () => {
-  console.log(chalk.yellow('\n🛑 Shutting down bot...'));
+  console.log(chalk.yellow('\n🛑 Mematikan bot...'));
   rl.close();
   process.exit(0);
 });
 
 process.on('uncaughtException', (err) => {
-  console.error(chalk.red('UNCAUGHT EXCEPTION:'), err);
+  console.error(chalk.red('PENGECUALIAN TIDAK TERTANGKAP:'), err);
 });
 
