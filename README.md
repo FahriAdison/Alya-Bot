@@ -24,6 +24,24 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## **[v1.2.0] - 2025-07-08**
+### ✨ New Features
+- **Dukungan Multi-Owner**: Sekarang dapat mengkonfigurasi beberapa nomor owner di `config.js`.
+- **Eksekusi Perintah Owner Gabungan**: Perintah `eval` (`=>`, `>`) dan `shell` (`$`) digabungkan ke dalam satu plugin `exec.js` untuk manajemen yang lebih mudah.
+- **Output Perintah Owner Langsung**: Output dari perintah `eval` dan `shell` sekarang dikirim langsung sebagai teks di chat (tidak lagi sebagai file, kecuali jika sangat panjang).
+
+### 🐞 Bug Fixes
+- **Perbaikan Antispam Command**: Sistem antispam sekarang berfungsi dengan benar hanya untuk perintah bot, dengan pesan peringatan yang muncul saat spam terdeteksi.
+- **Pesan Pendaftaran Akurat**: Pesan "Anda harus mendaftar" tidak lagi muncul untuk pesan non-perintah, hanya ketika pengguna yang belum terdaftar mencoba menggunakan perintah bot (selain `register`/`unregister`).
+- **Perintah Case-Insensitive**: Semua perintah bot sekarang merespons tanpa mempedulikan huruf besar atau kecil (misal: `menu` atau `Menu` akan berfungsi).
+- **Perbaikan Eksekusi JS Owner (`eval`)**: Memperbaiki masalah `SyntaxError: Identifier 'm' has already been declared` dan memastikan output yang benar (tidak lagi `undefined`) untuk ekspresi JavaScript.
+
+### 🚀 Improvements
+- **Deteksi Perintah Dinamis**: `index.js` sekarang secara otomatis mengumpulkan perintah dari setiap plugin, menghilangkan kebutuhan untuk pembaruan manual `commandTriggers`.
+- **Peningkatan Logging Konsol**: Log pesan di konsol sekarang lebih rapi, berwarna, dan informatif dengan struktur yang lebih baik dan penggunaan emoji.
+
+---
+
 ## **[v1.1.0] - 2025-02-16**
 ### ✨ New Features
 - **Added support for Character AI & OpenAI chat integration**
@@ -57,14 +75,8 @@ All notable changes to this project will be documented in this file.
 ---
 
 ## **✨ Features**
-- ✅ **WhatsApp AI Chat** (OpenAI & Character AI)  
-- ✅ **YouTube, TikTok, Instagram Video Downloader**  
-- ✅ **RPG Claim System & Leaderboard**  
-- ✅ **Group Management Tools** (Anti-Spam, Auto-Replies)  
 - ✅ **Owner Commands** (`exec`, `eval`, etc.)  
-- ✅ Works on **Windows, macOS, Linux, Ubuntu, Termux, and Pterodactyl!**  
-
----
+- ✅ Works on **Windows, macOS, Linux, Ubuntu, Termux, and Pterodactyl!** ---
 
 ## **📦 Installation Guide**
 Follow these steps to set up Alya-Bot on **any platform**.
@@ -78,146 +90,11 @@ Follow these steps to set up Alya-Bot on **any platform**.
 ```bash
 1. Install [Node.js](https://nodejs.org/) & [Git](https://git-scm.com/downloads)
 2. Open PowerShell or CMD and run:
-   git clone https://github.com/FahriAdison/Alya-Bot.git
+   git clone [https://github.com/FahriAdison/Alya-Bot.git](https://github.com/FahriAdison/Alya-Bot.git)
    cd YOUR-REPO
    npm install
 
 3. Start the bot:
    node index.js
 
-4. Scan the QR code to link WhatsApp!
-```
-
-### **🍏 macOS Setup**
-```bash
-1. Install Node.js & Git:
-   brew install node git
-
-2. Clone the repository & install dependencies:
-   git clone https://github.com/FahriAdison/Alya-Bot.git
-   cd YOUR-REPO
-   npm install
-
-3. Run the bot:
-   node index.js
-```
-
-### **🐧 Linux / Ubuntu Setup**
-```bash
-1. Update system & install Node.js, Git, FFmpeg:
-   sudo apt update && sudo apt upgrade -y
-   sudo apt install nodejs npm git ffmpeg -y
-
-2. Clone the project & install dependencies:
-   git clone https://github.com/FahriAdison/Alya-Bot.git
-   cd YOUR-REPO
-   npm install
-
-3. Run the bot:
-   node index.js
-```
-
-### **📱 Termux (Android) Setup**
-```bash
-1. Install Termux from F-Droid (Not Play Store)
-
-2. Update packages & install dependencies:
-   pkg update && pkg upgrade
-   pkg install nodejs git ffmpeg -y
-
-3. Clone and install the bot:
-   git clone https://github.com/FahriAdison/Alya-Bot.git
-   cd YOUR-REPO
-   npm install
-
-4. Start the bot:
-   node index.js
-
-5. Scan the QR code in WhatsApp Web.
-```
-
-### **📦 Pterodactyl Panel Setup**
-```bash
-1. Create a new server with Node.js 16+
-2. Connect to the server & install dependencies:
-   cd /home/container
-   npm install
-
-3. Run the bot:
-   node index.js
-
-4. Scan the QR code from the panel console.
-```
-
----
-
-## **🚀 Usage Guide**
-### **📜 Commands**
-- **Register:**  
-  `register <your_name>`
-- **Check Server Status:**  
-  `ping`
-- **Download YouTube Video:**  
-  `play <song_name>`
-- **Download TikTok Video:**  
-  `tiktok <link>`
-- **Claim Daily Bonus:**  
-  `claim`
-- **Check Leaderboard:**  
-  `leaderboard`
-
----
-
-## **🔧 Configuration**
-Modify `config.js` to customize bot settings:
-```javascript
-export default {
-  ownerNumber: '1234567890@s.whatsapp.net',
-  botName: 'Alya-Bot',
-  prefix: '!',
-  sessionPath: 'auth_info_baileys'
-};
-```
-
----
-
-## **🛠️ Troubleshooting**
-- **Bot Doesn't Start?**  
-  Ensure you have Node.js 16+ installed.
-
-- **Delete `auth_info_baileys/` and restart:**  
-  ```bash
-  rm -rf auth_info_baileys
-  node index.js
-  ```
-
-- **Session Expired?**  
-  Run:
-  ```bash
-  rm -rf auth_info_baileys
-  ```
-  Restart and scan the QR code again.
-
----
-
-## **📜 License**
-This project is licensed under the **MIT License**.
-
----
-
-## **💙 Credits**
-- **Alya-Bot** by Papah-Chan Fahri  
-- **Baileys Library** by @whiskeysockets  
-- **Contributors:**  
-  - Sad Teams  
-  - Jhnspntx  
-  - Willy  
-  - And All The Users 😊  
-
----
-
-<p align="center">
-  💻 Developed with ❤️ by Papah-Chan Fahri 🚀
-</p>
-
----
+4. Pairing Your Number To WhatsApp!
