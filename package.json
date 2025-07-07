@@ -11,15 +11,10 @@
     "@hapi/boom": "^10.0.1",
     "@whiskeysockets/baileys": "^6.7.12",
     "axios": "^1.7.9",
-    "cainode": "^1.2.2",
-    "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
     "moment-timezone": "^0.5.47",
     "pino": "^9.6.0",
-    "qrcode-terminal": "^0.12.0",
-    "syntax-error": "^1.4.0",
-    "youtube-dl-exec": "^3.0.15",
-    "ytsr": "^3.8.4"
+    "syntax-error": "^1.4.0"
   },
    "author": "FahriAdison",
    "license": "MIT"
