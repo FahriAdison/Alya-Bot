@@ -1,8 +1,11 @@
+// plugins/menu.js
 import { sendFakeAdMessage } from '../../lib/function.js';
 
 export default {
+  command: 'menu', // Pastikan ini ada
   handle: async (sock, msg) => {
-    if (msg.message?.conversation === 'menu') {
+    const messageText = msg.message?.conversation || ''; // Ambil teks pesan
+    if (messageText.toLowerCase() === 'menu') { // <--- Pastikan Anda menggunakan .toLowerCase() di sini
       const message = `
 *Hai,Saya Adalah Bot Alya,Saya Ada Assisten Bot WhatsApp Dibuat Oleh Papah-Chan Menggunakan Javascript,Berikut Daftar Menu Yang Ku Milik:*
 

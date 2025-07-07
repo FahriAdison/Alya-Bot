@@ -1,10 +1,12 @@
+// plugins/ping.js
 import os from 'os';
 import { sendFakeAdMessage } from '../../lib/function.js';
 
 export default {
+  command: 'ping', // Pastikan ini ada
   handle: async (sock, msg) => {
-    const messageText = msg.message?.conversation || '';
-    if (messageText.toLowerCase() === 'ping') {
+    const messageText = msg.message?.conversation || ''; // Ambil teks pesan
+    if (messageText.toLowerCase() === 'ping') { // <--- Pastikan Anda menggunakan .toLowerCase() di sini
       const memUsage = process.memoryUsage();
       const totalMem = os.totalmem();
       const freeMem = os.freemem();
