@@ -35,7 +35,7 @@ export default {
     // Periksa apakah jumlah pesan melebihi batas dalam jendela waktu
     if (userMessageTimestamps[userId].length > MESSAGE_THRESHOLD) {
       msg.isSpam = true; // Tandai pesan sebagai spam
-      console.log(chalk.red(`ANTISPAM DEBUG: User ${userId} terdeteksi SPAM command. Menandai msg.isSpam = true.`)); // Log debug
+      // Log debug antispam dihapus
 
       // Kirim peringatan hanya jika belum dikirim baru-baru ini (misal: setiap 10 detik)
       if (!spamWarningSent[userId] || (now - spamWarningSent[userId] > 10000)) {
@@ -44,8 +44,6 @@ export default {
         }, { quoted: msg });
         spamWarningSent[userId] = now; // Catat waktu peringatan dikirim
       }
-      // Penting: Jangan return di sini. Biarkan index.js yang menangani 'continue' berdasarkan msg.isSpam
-      // Ini memastikan pesan spam tetap ditandai dan diabaikan oleh loop utama.
     } else {
       // Jika pesan tidak dianggap spam (atau tidak melebihi batas), reset pelacak peringatan untuk pengguna ini
       delete spamWarningSent[userId];
